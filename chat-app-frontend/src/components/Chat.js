@@ -336,7 +336,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:5000', { withCredentials: true }); // Ensure proper connection
+const socket = io('http://192.168.0.107:5000', { withCredentials: true }); // Ensure proper connection
 
 function Chat() {
   const [message, setMessage] = useState('');
@@ -362,7 +362,7 @@ function Chat() {
     if (!user || !user.username) return;
     socket.emit('registerUser', user.username);
 
-    fetch(`http://localhost:5000/users?currentUser=${encodeURIComponent(user.username)}`)
+    fetch(`http://192.168.0.107:5000/users?currentUser=${encodeURIComponent(user.username)}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.users && Array.isArray(data.users)) {
@@ -431,16 +431,21 @@ function Chat() {
   };
 
   return (
-    <div style={styles.chatContainer}>
-      <div style={styles.sidebar}>
-        <h3>Users</h3>
-        <ul style={styles.userList}>
+    <div className="flex h-screen bg-blue-50 text-gray-800">
+      {/* Sidebar */}
+      <div className="w-1/4 p-4 border-r border-gray-200 bg-white shadow-md">
+        <h3 className="text-lg font-semibold mb-4">Users</h3>
+        <ul className="space-y-2 overflow-y-auto h-[85vh]">
           {users.length > 0 ? (
             users.map((u) => (
               <li
                 key={u._id}
-                style={selectedUser && u.username === selectedUser.username ? styles.activeUser : styles.userItem}
                 onClick={() => setSelectedUser(u)}
+                className={`cursor-pointer p-2 rounded-md transition-colors ${
+                  selectedUser && u.username === selectedUser.username
+                    ? 'bg-blue-100 font-semibold'
+                    : 'hover:bg-gray-100'
+                }`}
               >
                 {u.username}
               </li>
@@ -450,104 +455,43 @@ function Chat() {
           )}
         </ul>
       </div>
-      <div style={styles.chatBox}>
-        <div style={styles.messagesContainer}>
+
+      {/* Chat box */}
+      <div className="w-3/4 flex flex-col p-4">
+        <div className="flex-grow overflow-y-auto mb-4 space-y-2 bg-white rounded-2xl p-4 shadow-md">
           {messages.map((msg, index) => (
-            <div key={index} style={msg.self ? styles.myMessage : styles.otherMessage}>
+            <div
+              key={index}
+              className={`max-w-xs px-4 py-2 rounded-xl text-sm break-words ${
+                msg.self
+                  ? 'ml-auto bg-blue-100 text-right'
+                  : 'mr-auto bg-gray-100 text-left'
+              }`}
+            >
               <strong>{msg.sender}:</strong> {msg.text}
             </div>
           ))}
           <div ref={messagesEndRef}></div>
         </div>
-        <input
-          type="text"
-          placeholder="Type a message..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          style={styles.input}
-        />
-        <button onClick={handleSendMessage} style={styles.sendButton}>
-          Send
-        </button>
+
+        <div className="flex gap-2 items-center">
+          <input
+            type="text"
+            placeholder="Type a message..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="flex-grow px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <button
+            onClick={handleSendMessage}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+            Send
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
 export default Chat;
-
-
-// // Styling for Chat Component
-const styles = {
-  chatContainer: {
-    display: 'flex',
-    height: '100vh',
-  },
-  sidebar: {
-    width: '25%',
-    borderRight: '1px solid #ccc',
-    padding: '10px',
-    overflowY: 'auto',
-  },
-  chatBox: {
-    width: '75%',
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '10px',
-  },
-  messagesContainer: {
-    flexGrow: 1,
-    overflowY: 'auto',
-    marginBottom: '10px',
-  },
-  userList: {
-    listStyleType: 'none',
-    padding: 0,
-  },
-  userItem: {
-    padding: '10px',
-    cursor: 'pointer',
-    borderBottom: '1px solid #ddd',
-    transition: 'background-color 0.2s ease',
-  },
-  activeUser: {
-    padding: '10px',
-    cursor: 'pointer',
-    backgroundColor: '#d3f1fc',
-    borderBottom: '1px solid #ddd',
-  },
-  myMessage: {
-    textAlign: 'right',
-    backgroundColor: '#d3f1fc',
-    padding: '10px',
-    margin: '5px 0',
-    borderRadius: '10px',
-    animation: 'fadeIn 0.5s ease',
-  },
-  otherMessage: {
-    textAlign: 'left',
-    backgroundColor: '#fcd3d3',
-    padding: '10px',
-    margin: '5px 0',
-    borderRadius: '10px',
-    animation: 'fadeIn 0.5s ease',
-  },
-  input: {
-    width: '98%',
-    padding: '10px',
-    marginBottom: '5px',
-    border: '1px solid #ccc',
-    borderRadius: '5px',
-    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-    transition: 'box-shadow 0.3s ease',
-  },
-  sendButton: {
-    padding: '10px',
-    backgroundColor: '#4CAF50',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    transition: 'transform 0.2s ease',
-  },
-};
