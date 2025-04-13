@@ -335,8 +335,9 @@
 // Chat.js
 import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
+import axios from 'axios';
 
-const socket = io('http://192.168.0.107:5000', { withCredentials: true }); // Ensure proper connection
+const socket = io('http://192.168.0.107:5000', { withCredentials: true });
 
 function Chat() {
   const [message, setMessage] = useState('');
@@ -345,8 +346,8 @@ function Chat() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [user, setUser] = useState(null);
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
 
-  // Retrieve the current user from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
@@ -357,7 +358,6 @@ function Chat() {
     }
   }, []);
 
-  // Fetch user list and register user
   useEffect(() => {
     if (!user || !user.username) return;
     socket.emit('registerUser', user.username);
@@ -374,7 +374,6 @@ function Chat() {
       .catch((err) => console.error('Error fetching users:', err));
   }, [user]);
 
-  // Load chat history when selecting a user
   useEffect(() => {
     if (user && selectedUser) {
       socket.emit('fetchMessages', { user1: user.username, user2: selectedUser.username });
@@ -390,7 +389,6 @@ function Chat() {
     }
   }, [user, selectedUser]);
 
-  // Listen for incoming messages
   useEffect(() => {
     const privateMessageListener = (newMessage) => {
       setMessages((prev) => [...prev, newMessage]);
@@ -402,14 +400,12 @@ function Chat() {
     };
   }, []);
 
-  // Scroll to the bottom of the messages
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
 
-  // Send private message
   const handleSendMessage = () => {
     if (!message.trim()) {
       alert('Message cannot be empty!');
@@ -430,6 +426,35 @@ function Chat() {
     }
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await axios.post('http://192.168.0.107:5000/api/chat/upload', formData); // Match backend URL
+      const imageUrl = res.data.url;
+
+      if (imageUrl) {
+
+        const imageMessage = {
+          sender: user.username,
+          recipient: selectedUser.username,
+          image: imageUrl,
+        };
+
+        socket.emit('sendPrivateMessage', imageMessage);
+        setMessages((prev) => [...prev, { ...imageMessage, self: true }]);
+      } else {
+        console.error("NO image url returned from the server.");
+      }
+    } catch (err) {
+      console.error('Image upload failed:', err);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-blue-50 text-gray-800">
       {/* Sidebar */}
@@ -441,11 +466,10 @@ function Chat() {
               <li
                 key={u._id}
                 onClick={() => setSelectedUser(u)}
-                className={`cursor-pointer p-2 rounded-md transition-colors ${
-                  selectedUser && u.username === selectedUser.username
-                    ? 'bg-blue-100 font-semibold'
-                    : 'hover:bg-gray-100'
-                }`}
+                className={`cursor-pointer p-2 rounded-md transition-colors ${selectedUser && u.username === selectedUser.username
+                  ? 'bg-blue-100 font-semibold'
+                  : 'hover:bg-gray-100'
+                  }`}
               >
                 {u.username}
               </li>
@@ -456,24 +480,32 @@ function Chat() {
         </ul>
       </div>
 
-      {/* Chat box */}
+      {/* Chat Box */}
       <div className="w-3/4 flex flex-col p-4">
         <div className="flex-grow overflow-y-auto mb-4 space-y-2 bg-white rounded-2xl p-4 shadow-md">
           {messages.map((msg, index) => (
             <div
               key={index}
-              className={`max-w-xs px-4 py-2 rounded-xl text-sm break-words ${
-                msg.self
-                  ? 'ml-auto bg-blue-100 text-right'
-                  : 'mr-auto bg-gray-100 text-left'
-              }`}
+              className={`max-w-xs px-4 py-2 rounded-xl text-sm break-words ${msg.self
+                ? 'ml-auto bg-blue-100 text-right'
+                : 'mr-auto bg-gray-100 text-left'
+                }`}
             >
-              <strong>{msg.sender}:</strong> {msg.text}
+              <strong>{msg.sender}:</strong>
+              {msg.text && <p>{msg.text}</p>}
+              {msg.image && (
+                <img
+                  src={msg.image}
+                  alt="sent-img"
+                  className="mt-2 max-w-full rounded-lg"
+                />
+              )}
             </div>
           ))}
           <div ref={messagesEndRef}></div>
         </div>
 
+        {/* Input Area */}
         <div className="flex gap-2 items-center">
           <input
             type="text"
@@ -482,6 +514,19 @@ function Chat() {
             onChange={(e) => setMessage(e.target.value)}
             className="flex-grow px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
+          <input
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            ref={fileInputRef}
+            onChange={handleImageUpload}
+          />
+          <button
+            onClick={() => fileInputRef.current.click()}
+            className="px-2 text-blue-500"
+          >
+            📷
+          </button>
           <button
             onClick={handleSendMessage}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
