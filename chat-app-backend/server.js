@@ -188,7 +188,7 @@ const app = express();
 const server = http.createServer(app);
 
 const corsOptions = {
-  origin: ['http://localhost:3000','http://192.168.0.107:3000'],
+  origin: ['http://localhost:3000','http://192.168.0.100:3000'],
   credentials: true,
 };
 
@@ -198,7 +198,7 @@ app.use('/api/chat',chatRoutes);
 
 
 const io = socketIo(server, {
-  cors: { origin: ["http://localhost:3000",'http://192.168.0.107:3000'], methods: ['GET', 'POST'], credentials: true },
+  cors: { origin: ["http://localhost:3000",'http://192.168.0.100:3000'], methods: ['GET', 'POST'], credentials: true },
 });
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -230,8 +230,8 @@ io.on('connection', (socket) => {
         chatId: `${sender}_${recipient}`, 
         sender, 
         recipient,   // Ensure recipient is included here
-        text,
-        image
+        text: text || '',
+        image: image || '',
       });
       await newMessage.save();
   
