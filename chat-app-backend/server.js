@@ -187,7 +187,7 @@ const app = express();
 const server = http.createServer(app);
 
 const corsOptions = {
-  origin: ['http://localhost:3000','http://192.168.0.107:3000'],
+  origin: ['http://localhost:3000'],
   credentials: true,
 };
 
@@ -195,7 +195,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 const io = socketIo(server, {
-  cors: { origin: ["http://localhost:3000",'http://192.168.0.107:3000'], methods: ['GET', 'POST'], credentials: true },
+  cors: { origin: ["http://localhost:3000"], methods: ['GET', 'POST'], credentials: true },
 });
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })

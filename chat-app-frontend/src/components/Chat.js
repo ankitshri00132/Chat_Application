@@ -336,7 +336,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 
-const socket = io('http://192.168.0.107:5000', { withCredentials: true }); // Ensure proper connection
+const socket = io('http://localhost:5000', { withCredentials: true }); // Ensure proper connection
 
 function Chat() {
   const [message, setMessage] = useState('');
@@ -362,7 +362,7 @@ function Chat() {
     if (!user || !user.username) return;
     socket.emit('registerUser', user.username);
 
-    fetch(`http://192.168.0.107:5000/users?currentUser=${encodeURIComponent(user.username)}`)
+    fetch(`http://localhost:5000/users?currentUser=${encodeURIComponent(user.username)}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.users && Array.isArray(data.users)) {
