@@ -13,7 +13,7 @@ function Login() {
     setError(null);
 
     try {
-      const response = await fetch('http://192.168.0.100:5000/auth/login', { //http://localhost:5000/auth/login previously used to run on laptop only
+      const response = await fetch('http://localhost:5000/auth/login', { //http://localhost:5000/auth/login previously used to run on laptop only
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
