@@ -182,20 +182,23 @@ const userRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
 const Message = require('./models/Message');
 require('dotenv').config();
+const chatRoutes = require('./routes/chat');//for image upload
 
 const app = express();
 const server = http.createServer(app);
 
 const corsOptions = {
-  origin: ['http://localhost:3000','http://192.168.0.107:3000'],
+  origin: ['http://localhost:3000','http://192.168.0.100:3000'],
   credentials: true,
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use('/api/chat',chatRoutes);
+
 
 const io = socketIo(server, {
-  cors: { origin: ["http://localhost:3000",'http://192.168.0.107:3000'], methods: ['GET', 'POST'], credentials: true },
+  cors: { origin: ["http://localhost:3000",'http://192.168.0.100:3000'], methods: ['GET', 'POST'], credentials: true },
 });
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -216,9 +219,9 @@ io.on('connection', (socket) => {
     console.log(`User registered: ${username} (Socket ID: ${socket.id})`);
   });
 
-  socket.on('sendPrivateMessage', async ({ sender, recipient, text }) => {
-    if (!sender || !recipient || !text) {
-      console.error("Invalid message data:", { sender, recipient, text });
+  socket.on('sendPrivateMessage', async ({ sender, recipient, text, image }) => {
+    if (!sender || !recipient || (!text && !image)) {
+      console.error("Invalid message data:", { sender, recipient, text, image });
       return;
     }
   
@@ -227,13 +230,14 @@ io.on('connection', (socket) => {
         chatId: `${sender}_${recipient}`, 
         sender, 
         recipient,   // Ensure recipient is included here
-        text 
+        text: text || '',
+        image: image || '',
       });
       await newMessage.save();
   
       const recipientSocketId = userSockets[recipient];
       if (recipientSocketId) {
-        io.to(recipientSocketId).emit('privateMessage', { sender, recipient, text });
+        io.to(recipientSocketId).emit('privateMessage', { sender, recipient, text,image });
       }
     } catch (error) {
       console.error("Error saving message:", error);
