@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import {motion} from 'framer-motion';
-import {Link,useNavigate} from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Register() {
   const [username, setUsername] = useState('');
@@ -14,12 +14,12 @@ function Register() {
     e.preventDefault();
     setError(null);
     if (password !== confirmPassword) {
-      alert('Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:5000/auth/register',{
+      const response = await fetch('http://localhost:5000/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),
@@ -28,78 +28,106 @@ function Register() {
       const data = await response.json();
 
       if (response.ok) {
-        alert('Registration successful! Please log in.');
         navigate('/login'); 
       } else {
-        alert(data.message || 'Registration failed');
+        setError(data.message || 'Registration failed');
       }
     } catch (error) {
-      alert('An error occurred during registration');
+      setError('An error occurred during registration');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[url('https://img.freepik.com/free-vector/abstract-blue-light-pipe-speed-zoom-black-background-technology_1142-9530.jpg')] bg-cover bg-center">
       <motion.form
         onSubmit={handleRegister}
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="bg-blue-50 p-8 rounded-2xl shadow-lg w-full max-w-md border border-blue-100"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.2 }}
+        className="bg-gray-900/80 backdrop-blur-sm p-10 rounded-2xl shadow-xl w-full max-w-md border border-blue-400/20"
       >
-        <h2 className="text-2xl font-semibold text-center mb-6 text-blue-700">Register</h2>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-white mb-2">Create Account</h2>
+          <p className="text-blue-100">Sign up to get started</p>
+        </div>
+        
+        {error && (
+          <div className="bg-red-900/50 text-red-300 p-3 rounded-lg mb-4 text-sm border border-red-700/30">
+            {error}
+          </div>
+        )}
 
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-          className="w-full px-4 py-2 mb-4 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="w-full px-4 py-2 mb-4 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="w-full px-4 py-2 mb-4 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        <input
-          type="password"
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-          className="w-full px-4 py-2 mb-6 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
+        <div className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-blue-100 mb-1">Username</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-gray-800/70 text-white border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-blue-200/50"
+              placeholder="Enter your username"
+            />
+          </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors"
-        >
-          Register
-        </button>
+          <div>
+            <label className="block text-sm font-medium text-blue-100 mb-1">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-gray-800/70 text-white border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-blue-200/50"
+              placeholder="Enter your email"
+            />
+          </div>
 
-        <p className="mt-4 text-sm text-center text-slate-600">
+          <div>
+            <label className="block text-sm font-medium text-blue-100 mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-gray-800/70 text-white border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-blue-200/50"
+              placeholder="Enter your password"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-blue-100 mb-1">Confirm Password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-gray-800/70 text-white border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-blue-200/50"
+              placeholder="Confirm your password"
+            />
+          </div>
+
+          <motion.button
+            type="submit"
+            className="w-full bg-blue-600 text-white font-medium py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+          >
+            Create Account
+          </motion.button>
+        </div>
+
+        <div className="mt-6 text-center text-sm text-blue-200">
           Already have an account?{' '}
-          <Link to="/login" className="text-blue-600 hover:underline">
-            Login
+          <Link 
+            to="/login" 
+            className="text-blue-300 font-medium hover:text-white hover:underline"
+          >
+            Sign in
           </Link>
-        </p>
+        </div>
       </motion.form>
     </div>
   );
-
 }
 
 export default Register;

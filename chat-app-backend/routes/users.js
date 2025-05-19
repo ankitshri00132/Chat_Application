@@ -1,25 +1,3 @@
-// const express = require('express');
-// const User = require('../models/User');
-// const router = express.Router();
-
-// router.get('/', async (req, res) => {
-//   const { currentUser } = req.query; // Current user's username/email
-//   try {
-//     const users = await User.find({ username: { $ne: currentUser } }); // Exclude current user
-//     const userList = users.map((user) => ({
-//       username: user.username,
-//       email: user.email,
-//     }));
-//     res.json(userList);
-//   } catch (error) {
-//     console.error('Error fetching users:', error);
-//     res.status(500).json({ error: 'Failed to fetch users' });
-//   }
-// });
-
-// module.exports = router;
-
-
 const express = require('express');
 const User = require('../models/User'); // Your User model
 const router = express.Router();

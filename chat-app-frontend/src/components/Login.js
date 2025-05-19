@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -13,7 +13,7 @@ function Login() {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:5000/auth/login', { //http://localhost:5000/auth/login previously used to run on laptop only
+      const response = await fetch('http://localhost:5000/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -25,11 +25,10 @@ function Login() {
         throw new Error(userData.message || 'Login failed');
       }
 
-      if (!userData.user || !userData.token) {  // Fix: Removed redundant check
+      if (!userData.user || !userData.token) {
         throw new Error('Invalid user data received');
       }
 
-      // Store only necessary user details
       localStorage.setItem('currentUser', JSON.stringify(userData.user));
       localStorage.setItem('token', userData.token);
 
@@ -42,44 +41,69 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[url('https://img.freepik.com/free-vector/abstract-blue-light-pipe-speed-zoom-black-background-technology_1142-9530.jpg')] bg-cover bg-center">
       <motion.form
         onSubmit={handleLogin}
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="bg-blue-50 p-8 rounded-2xl shadow-md w-full max-w-md"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.7 }}
+        className="bg-gray-900/80 backdrop-blur-sm p-10 rounded-2xl shadow-xl w-full max-w-md border border-blue-400/20"
       >
-        <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">Login</h2>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="w-full px-4 py-2 mb-6 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors"
-        >
-          Login
-        </button>
-        <p className="mt-4 text-sm text-center text-gray-700">
-          Don&apos;t have an account?{' '}
-          <Link to="/register" className="text-blue-600 hover:underline">
-            Register
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-white mb-2">Welcome back</h2>
+          <p className="text-blue-100">Sign in to your account</p>
+        </div>
+        
+        {error && (
+          <div className="bg-red-900/50 text-red-300 p-3 rounded-lg mb-4 text-sm border border-red-700/30">
+            {error}
+          </div>
+        )}
+        
+        <div className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-blue-100 mb-1">Username</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-gray-800/70 text-white border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-blue-200/50"
+              placeholder="Enter your username"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-blue-100 mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-gray-800/70 text-white border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-blue-200/50"
+              placeholder="Enter your password"
+            />
+          </div>
+          
+          <motion.button
+            type="submit"
+            className="w-full bg-blue-600 text-white font-medium py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+          >
+            Sign In
+          </motion.button>
+        </div>
+        
+        <div className="mt-6 text-center text-sm text-blue-200">
+          Don't have an account?{' '}
+          <Link 
+            to="/register" 
+            className="text-blue-300 font-medium hover:text-white hover:underline"
+          >
+            Sign up
           </Link>
-        </p>
+        </div>
       </motion.form>
     </div>
   );
