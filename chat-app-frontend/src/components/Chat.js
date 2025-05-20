@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 
-const socket = io('http://localhost:5000', { withCredentials: true });
+const socket = io(process.env.REACT_APP_API_BASE_URL, { withCredentials: true });
 
 function Chat() {
   const [message, setMessage] = useState('');
@@ -27,7 +27,7 @@ function Chat() {
     if (!user || !user.username) return;
     socket.emit('registerUser', user.username);
 
-    fetch(`http://localhost:5000/users?currentUser=${encodeURIComponent(user.username)}`)
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/users?currentUser=${encodeURIComponent(user.username)}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.users && Array.isArray(data.users)) {
@@ -99,7 +99,7 @@ function Chat() {
     formData.append('image', file);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/chat/upload', formData); // Match backend URL
+      const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/chat/upload`, formData); // Match backend URL
       const imageUrl = res.data.url;
 
       if (imageUrl) {
