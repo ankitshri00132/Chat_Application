@@ -1,4 +1,4 @@
-# Real-Time MERN Chat Application 💬📷
+# Real-Time Chat Application 💬📷
 
 A full-stack chat application built using the MERN (MongoDB, Express, React, Node.js) stack, featuring real-time one-on-one messaging, image sharing, responsive UI, and deployment on **Render (backend)** and **Vercel (frontend)**.
 
@@ -53,4 +53,13 @@ A full-stack chat application built using the MERN (MongoDB, Express, React, Nod
 ```bash
 cd chat-app-backend
 npm install
+node server.js
+```
+
+### Frontend Setup
+
+```bash
+cd chat-app-frontend
+npm install
+npm start
 ```
